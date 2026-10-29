@@ -1,12 +1,12 @@
 from django.urls import path
+
 from . import views
 from .views import (
-    PostListView,
-    PostDetailView,
     PostCreateView,
-    PostUpdateView,
-    SportListView,
     PostDeleteView,
+    PostDetailView,
+    PostListView,
+    PostUpdateView,
 )
 
 urlpatterns = [
@@ -31,4 +31,3 @@ urlpatterns = [
     path("contact/", views.contact, name="contact"),
     path("subscribe/", views.subscribe, name="subscribe"),
 ]
-

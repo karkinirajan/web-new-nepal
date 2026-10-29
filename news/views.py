@@ -1,10 +1,7 @@
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.core.mail import EmailMessage
 from django.shortcuts import redirect, render
-from .models import Newsletter
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -25,6 +22,7 @@ from .models import (
     LifeStyle,
     Literature,
     National,
+    Newsletter,
     Politics,
     Post,
     Sports,
@@ -47,14 +45,6 @@ class PostDetailView(DetailView):
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     fields = "__all__"
-    email = EmailMessage(
-        "Thank You For Subscription",
-        "Body",
-        settings.EMAIL_HOST_USER,
-        ["karkinirajan1999@gmail.com"],
-    )
-    email.fail_silently = True
-    # email.send()
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -170,13 +160,18 @@ def contact(request):
             user_id = request.user.id
 
         contact = Contact(
-            name=name, email=email, phone=phone, message=message, user_id=user_id,
+            name=name,
+            email=email,
+            phone=phone,
+            message=message,
+            user_id=user_id,
         )
 
         contact.save()
 
         messages.success(
-            request, "Your message has been sent, We will get back to you soon",
+            request,
+            "Your message has been sent, We will get back to you soon",
         )
 
         return redirect("/")
@@ -185,23 +180,16 @@ def contact(request):
 
 
 def subscribe(request):
-    if request.method == "POST":
-        name = request.POST["name"]
-        email = request.POST["email"]
-        user_id = request.POST["user_id"]
-
-        # Check if user has contacted already
-        if request.user.is_authenticated:
-            user_id = request.user.id
-            has_contacted = Newsletter.objects.all().filter(email=email)
-            if has_contacted:
-                messages.error(request, "You have already Subscribed to our Newsletter")
-                return redirect("/")
-        elif Newsletter.objects.filter(email=email).exists():
-            messages.error(request, "You have already Subscribed to our Newsletter")
-            return redirect("/")
-
-        sub = Newsletter(name=name, email=email, user_id=user_id)
-        messages.success(request, "Thank Your For Subscription")
-        sub.save()
+    if request.method != "POST":
         return redirect("/")
+    name = request.POST["name"]
+    email = request.POST["email"]
+    user_id = request.user.id if request.user.is_authenticated else request.POST.get("user_id") or 0
+
+    if Newsletter.objects.filter(email=email).exists():
+        messages.error(request, "You have already Subscribed to our Newsletter")
+        return redirect("/")
+
+    Newsletter(name=name, email=email, user_id=user_id).save()
+    messages.success(request, "Thank Your For Subscription")
+    return redirect("/")

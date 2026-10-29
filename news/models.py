@@ -1,9 +1,9 @@
-from django.db import models
-from datetime import datetime
-from django.urls import reverse
-from embed_video.fields import EmbedVideoField
-from django.contrib.auth.models import User
 from ckeditor_uploader.fields import RichTextUploadingField
+from django.contrib.auth.models import User
+from django.db import models
+from django.urls import reverse
+from django.utils import timezone
+from embed_video.fields import EmbedVideoField
 
 
 class Post(models.Model):
@@ -76,6 +76,9 @@ class Education(Post):
 class Youtube(models.Model):
     yt_vid = EmbedVideoField(max_length=140, blank=True)
 
+    def __str__(self):
+        return self.yt_vid
+
 
 class Business(Post):
     pass
@@ -86,7 +89,7 @@ class Contact(models.Model):
     email = models.CharField(max_length=100)
     phone = models.CharField(max_length=100, blank=True)
     message = models.TextField(blank=True)
-    contact_date = models.DateTimeField(default=datetime.now, blank=True)
+    contact_date = models.DateTimeField(default=timezone.now, blank=True)
     user_id = models.IntegerField(blank=True)
 
     def __str__(self):
@@ -109,6 +112,9 @@ class Comment(models.Model):
     body = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.user}: {self.body[:30]}"
+
 
 def get_comment(post_id):
     post = Post.objects.get(id=post_id)
@@ -120,6 +126,9 @@ class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     like = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user} likes {self.post}"
 
 
 def if_liked(request, id):

@@ -1,22 +1,22 @@
 from django.contrib import admin
 
 from .models import (
-    Post,
-    National,
-    International,
-    Covid,
-    Sports,
-    Entertainment,
-    Politics,
-    LifeStyle,
     Blog,
-    Literature,
-    Tech,
-    Health,
     Business,
-    Education,
     Contact,
+    Covid,
+    Education,
+    Entertainment,
+    Health,
+    International,
+    LifeStyle,
+    Literature,
+    National,
     Newsletter,
+    Politics,
+    Post,
+    Sports,
+    Tech,
     Youtube,
 )
 
@@ -39,4 +39,3 @@ admin.site.register(Newsletter)
 admin.site.register(Youtube)
 
 # admin.site.register(Comment)
-

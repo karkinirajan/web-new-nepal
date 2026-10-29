@@ -1,12 +1,12 @@
+from django.contrib.auth.models import User
 from django.http import JsonResponse
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render
 
-from .models import *
-from .models import *
+from .models import Comment, Like, Post
 
 
 def like(request, id):
-    if request.is_ajax:
+    if True:  # request.is_ajax() was removed in Django 4; this view is not routed
         if request.method == "POST":
             post = Post.objects.get(id=id)
             like = Like.objects.filter(post=post).filter(user=request.user)
@@ -51,4 +51,3 @@ def getlike(request, id):
     for like in story.like:
         likers += User.objects.filter(id=like.user.id)
     return render(request, "shared/likers.html", {"likers": likers})
-

@@ -11,3 +11,13 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .coverage
+
+# Runtime / generated artifacts
+db.sqlite3
+media/
+staticfiles/
+.venv/
+.env
+.vscode/
+.pytest_cache/
+.ruff_cache/

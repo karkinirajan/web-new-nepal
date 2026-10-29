@@ -1,7 +1,9 @@
-from django.db import models
+import os
+
 from django.contrib.auth.models import User
+from django.db import models
 from PIL import Image
-from datetime import datetime
+
 from news.models import Post
 
 
@@ -14,6 +16,10 @@ class Profile(models.Model):
 
     def save(self, *args, **kwargs):
         super(Profile, self).save(*args, **kwargs)
+
+        # default.jpg may not exist on disk (fresh checkout); skip resizing then.
+        if not self.image or not os.path.exists(self.image.path):
+            return
 
         img = Image.open(self.image.path)
 
@@ -31,4 +37,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.post.title}-{self.name}"
-

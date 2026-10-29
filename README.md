@@ -6,79 +6,61 @@
 
 ---
 
-## Features  
+## Features
 
-- **News Management**:  
-  - Add, edit, and delete news articles.  
-  - Categorize articles for better organization.  
+- Home page with paginated posts (6 per page, newest first) and post detail pages.
+- 13 category pages: national, covid, politics, international, sports, entertainment, lifestyle, blog, literature, health, education, business, tech.
+- Rich-text posts (CKEditor) with image, video upload, and embedded YouTube video.
+- Registration, login, logout, and profile with avatar upload.
+- Contact form (login required) and newsletter subscription.
+- Only a post's author can edit or delete it.
+- Django admin at `/admin/`.
 
-- **Responsive Design**:  
-  - Fully optimized for desktops, tablets, and mobile devices.  
+## Technology Stack
 
-- **Modern User Interface**:  
-  - Built with SCSS and CSS for a polished and visually appealing design.  
+Python 3.13, Django 5.2 LTS, django-ckeditor, django-crispy-forms (bootstrap4), django-embed-video, Pillow, WhiteNoise, gunicorn; SQLite by default or PostgreSQL via `DATABASE_URL`. Frontend assets are checked-in CSS/SCSS/JS under `newssite/static/`. Versions: [VERSIONS.md](./VERSIONS.md).
 
-- **Dynamic Functionality**:  
-  - Interactive features powered by JavaScript.  
+## Getting Started
 
-- **Backend Integration**:  
-  - Python-based backend for server-side functionality.  
+Requires [uv](https://docs.astral.sh/uv/).
 
----
+```bash
+git clone https://github.com/karkinirajan/web-new-nepal.git
+cd web-new-nepal
+export DJANGO_SECRET_KEY="$(python3 -c 'import secrets; print(secrets.token_urlsafe(50))')"
+export DJANGO_DEBUG=true
+uv sync
+uv run python manage.py migrate
+uv run python manage.py createsuperuser
+uv run python manage.py runserver
+```
 
-## Technology Stack  
+Open http://127.0.0.1:8000. All configuration is by environment variable; see [.env.example](./.env.example).
 
-- **Frontend**: JavaScript, CSS, SCSS, HTML  
-- **Backend**: Python  
+Production: set `DJANGO_DEBUG=false`, `DJANGO_ALLOWED_HOSTS`, `DJANGO_CSRF_TRUSTED_ORIGINS`, `DATABASE_URL` and SMTP settings, then run `migrate` and `collectstatic --noinput`. `Procfile` runs gunicorn. Do not commit secrets, local databases, or uploaded media.
 
----
+## Testing
 
-## Getting Started  
+```bash
+uv run pytest -q
+uv run ruff check . && uv run ruff format --check .
+```
 
-### Prerequisites  
+Tests (`tests/`) use `newssite.settings_test` (in-memory SQLite, temp media) and cover the home/detail/category pages, author-only edit/delete, contact, newsletter, registration, login/logout and profile. CI: `.github/workflows/ci.yml`.
 
-Ensure Python and pip are installed. The checked-in stylesheets and scripts are served as static files; this repository has no `package.json` or npm build step.
+## Security note
 
-### Installation  
+`django-ckeditor` bundles CKEditor 4, which is no longer supported and has unfixed security issues (Django prints check `ckeditor.W001`). Plan a migration to a maintained editor; see work-done.md.
 
-1. Clone the repository:  
-   ```bash  
-   git clone https://github.com/karkinirajan/web-new-nepal.git
-   cd web-new-nepal
-   ```  
+## Project structure
 
-2. Create and activate a virtual environment for the backend:  
-   ```bash  
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   ```  
-
-3. Install backend dependencies:  
-   ```bash  
-   pip install -r requirements.txt  
-   ```  
-
-4. Set a unique local secret and enable debug mode for local development:
-   ```bash
-   export DJANGO_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(50))')"
-   export DJANGO_DEBUG=true
-   export DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
-   ```
-5. Create the local database and an admin account:
-   ```bash
-   python manage.py migrate
-   python manage.py createsuperuser
-   ```
-6. Start the backend server with `python manage.py runserver` and open
-   `http://127.0.0.1:8000`.
-
-Production deployments must set `DJANGO_DEBUG=false`, configure
-`DJANGO_ALLOWED_HOSTS`, and provide a database through `DATABASE_URL`. Configure
-email with `DJANGO_EMAIL_HOST`, `DJANGO_EMAIL_PORT`, `DJANGO_EMAIL_HOST_USER`,
-`DJANGO_EMAIL_HOST_PASSWORD`, and `DJANGO_EMAIL_USE_TLS`. Email defaults to the
-console backend locally. Do not commit secrets, local databases, or uploaded media.
-
----
+```
+newssite/   settings, urls, wsgi/asgi, static assets, settings_test.py
+news/       posts, categories, contact, newsletter (models, views, urls)
+users/      profiles and authentication views, signals
+templates/  shared and per-app templates
+tests/      pytest suite
+```
 
 ## License  
 

@@ -1,9 +1,9 @@
-from django.shortcuts import render, redirect
-from django.contrib import messages, auth
-from django.contrib.auth.models import User
-from news.models import Contact
+from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
+from django.contrib.auth.models import User
+from django.shortcuts import redirect, render
+
+from .forms import ProfileUpdateForm, UserUpdateForm
 
 
 def register(request):
@@ -79,13 +79,11 @@ def logout(request):
 def profile(request):
     if request.method == "POST":
         u_form = UserUpdateForm(request.POST, instance=request.user)
-        p_form = ProfileUpdateForm(
-            request.POST, request.FILES, instance=request.user.profile
-        )
+        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
         if u_form.is_valid() and p_form.is_valid():
             u_form.save()
             p_form.save()
-            messages.success(request, f"Your account has been updated!")
+            messages.success(request, "Your account has been updated!")
             return redirect("profile")
 
     else:
@@ -95,4 +93,3 @@ def profile(request):
     context = {"u_form": u_form, "p_form": p_form}
 
     return render(request, "users/profile.html", context)
-

@@ -1,0 +1,13 @@
+# Local configuration and data
+.env
+.venv/
+venv/
+db.sqlite3
+staticfiles/
+/media/
+
+# Python bytecode and test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
